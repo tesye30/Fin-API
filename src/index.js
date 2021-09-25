@@ -5,24 +5,7 @@ const { v4 : uuidv4 } = require("uuid")
 
 const app = express();
 app.use(express.json());
-
-
-
 const customers = [];
-
-// Middleware
-function verifyIfExistsAccontCPF(request, response, next){
-    const { cpf} = request.headers;
-
-    const customer = customers.find((customer) => customer.cpf === cpf);
-
-    if(!customer) {
-        return response.status(400).json({ error: "Customer not found"});
-    }
-    return next();
-}
-
-
 /**
  * GET - Buscar uma informação dentro do servidor
  * POST - Inserir uma informação no servidor
@@ -36,6 +19,20 @@ function verifyIfExistsAccontCPF(request, response, next){
  * id - uuid
  * statement []
  */
+
+// Middleware
+function verifyIfExistsAccontCPF(request, response, next){
+    const { cpf} = request.headers;
+
+    const customer = customers.find((customer) => customer.cpf === cpf);
+
+    if(!customer) {
+        return response.status(400).json({ error: "Customer not found"});
+
+    }
+    return next();
+}
+
 app.post("/account", (request, response) => {
     const {cpf, name} = request.body;
 
