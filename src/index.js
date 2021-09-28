@@ -79,4 +79,21 @@ app.post("/deposit",verifyIfExistsAccontCPF, (request, response) => {
    return response.status(201).send();
 });
 
+app.post("/withdraw", verifyIfExistsAccontCPF, (request, response) => {
+
+});
+
+app.get("/statement/date", verifyIfExistsAccontCPF, (request, response) => {
+    const { customer} = request;
+    const {date} = request.query;
+
+    const dateFormat = new Date(date + " 00:00");
+
+    const statement = customer.statement.filter(
+        (statement) => statement.created_at.toDateString() === 
+        new Date (dateFormat).toDateString());
+
+    return response.json(statement);
+})
+
 app.listen(8080);
