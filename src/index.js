@@ -94,6 +94,21 @@ app.get("/statement/date", verifyIfExistsAccontCPF, (request, response) => {
         new Date (dateFormat).toDateString());
 
     return response.json(statement);
-})
+});
+
+app.put("/account", (request, response) => {
+    const {name} = request.body;
+    const {customer} = request;
+
+    customer.name = name;
+
+    return response.status(201).send();
+});
+
+app.get("/account", verifyIfExistsAccontCPF,(request, response) => {
+    const {customer } = request;
+
+    return response.json(customer);
+});
 
 app.listen(8080);
