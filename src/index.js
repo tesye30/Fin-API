@@ -96,7 +96,7 @@ app.get("/statement/date", verifyIfExistsAccontCPF, (request, response) => {
     return response.json(statement);
 });
 
-app.put("/account", (request, response) => {
+app.put("/account", verifyIfExistsAccontCPF,(request, response) => {
     const {name} = request.body;
     const {customer} = request;
 
@@ -110,5 +110,22 @@ app.get("/account", verifyIfExistsAccontCPF,(request, response) => {
 
     return response.json(customer);
 });
+
+app.delete("/account", verifyIfExistsAccontCPF, (request, response) => {
+    const { customer } = request;
+
+    //splice
+    customers.splice( customer, 1);
+
+    return response.status(200).json(customers)
+});
+
+app.get("/balance", verifyIfExistsAccontCPF, (request, response) => {
+    const {customer} = request;
+
+    const balance = getBalance(customer.statement);
+
+    return response.json(balance);
+})
 
 app.listen(8080);
