@@ -35,6 +35,19 @@ function verifyIfExistsAccontCPF(request, response, next){
     return next();
 }
 
+function getBalance(value){
+    const balance = value.reduce((accumulator, operation)=>{
+        if(operation.type === "credit"){
+            return accumulator+operation.amount
+        }else{
+            return accumulator - operation.amount
+        }
+       
+    },0);
+
+    return balance;
+}
+
 app.post("/account", (request, response) => {
     const {cpf, name} = request.body;
 
@@ -45,7 +58,6 @@ app.post("/account", (request, response) => {
         if(customerAlreadyExists) {
             return response.status(400).json({ error: "Customer already exists !"});
         }
-    const id = uuidv4();
 
     customers.push({
         cpf,
@@ -80,6 +92,22 @@ app.post("/deposit",verifyIfExistsAccontCPF, (request, response) => {
 });
 
 app.post("/withdraw", verifyIfExistsAccontCPF, (request, response) => {
+    const {amount} = request.body;
+
+    const {customer} = request;
+
+    const statmentWithdraw = getBalance(customer.statement);
+
+    if(statmentWithdraw < amount) {
+        return response.status(400).json({ error:" insufficient balance "})
+    }
+    const debitOperation = {
+        amount,
+        created_at: new Date(),
+        type: "debit" 
+    }
+    customer.statement.push(debitOperation);
+    return response.status(201).send();
 
 });
 
@@ -126,6 +154,6 @@ app.get("/balance", verifyIfExistsAccontCPF, (request, response) => {
     const balance = getBalance(customer.statement);
 
     return response.json(balance);
-})
+});
 
 app.listen(8080);
